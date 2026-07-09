@@ -1,0 +1,28 @@
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).parent))
+
+import streamlit as st
+from generate import generate
+
+st.title("RAG Finance Assistant")
+st.write("Ask questions about Apple, Microsoft, and NVIDIA 10-K annual reports.")
+
+with st.sidebar:
+    st.header("Filters")
+    ticker_options = {
+        "All companies": None,
+        "Apple (AAPL)": "AAPL",
+        "Microsoft (MSFT)": "MSFT",
+        "NVIDIA (NVDA)": "NVDA",
+    }
+    ticker_label = st.selectbox("Company", list(ticker_options.keys()))
+    ticker = ticker_options[ticker_label]  # None o "AAPL"/"MSFT"/"NVDA"
+
+query = st.text_input("Your question")
+
+if st.button("Ask") and query:
+    with st.spinner("Searching and generating answer..."):
+        answer = generate(query, ticker=ticker)
+    st.markdown(answer)
