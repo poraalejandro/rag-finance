@@ -1,6 +1,6 @@
 """
 Reads chunks from data/processed/chunks.jsonl, generates embeddings with
-Gemini's text-embedding-004 model, and stores them in a local ChromaDB collection.
+Gemini's gemini-embedding-001 model, and stores them in a local ChromaDB collection.
 Ticker and source are stored as metadata to enable per-company filtering later.
 """
 

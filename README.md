@@ -1,14 +1,15 @@
-# rag-finance — Asistente RAG sobre informes financieros (10-K)
+# rag-finance — RAG assistant for financial reports (10-K)
 
-Aplicación que responde preguntas en lenguaje natural sobre los informes anuales
-(10-K) de Apple, Microsoft y NVIDIA usando RAG (Retrieval-Augmented Generation).
+An application that answers natural-language questions about the annual
+reports (10-K) of Apple, Microsoft, and NVIDIA using RAG
+(Retrieval-Augmented Generation).
 
-En lugar de que el LLM responda de memoria, el sistema primero recupera los
-fragmentos más relevantes de los informes reales y se los pasa como contexto.
-El resultado: respuestas fundamentadas en cifras concretas, con referencia al
-documento fuente.
+Instead of letting the LLM answer from memory, the system first retrieves the
+most relevant passages from the actual reports and passes them as context.
+The result: answers grounded in concrete figures, with a reference to the
+source document.
 
-**Ejemplo:**
+**Example:**
 
 > *"What were Microsoft's main revenue sources in 2024?"*
 >
@@ -22,49 +23,49 @@ documento fuente.
 
 ---
 
-## Stack técnico
+## Tech stack
 
-| Componente      | Tecnología                    |
-| --------------- | ----------------------------- |
-| Lenguaje        | Python 3.12+                  |
-| Embeddings      | Gemini `gemini-embedding-001` |
-| Generación      | Gemini `gemini-2.5-flash`     |
-| Vector DB       | ChromaDB (local, persistente) |
-| Interfaz        | Streamlit                     |
-| Fuente de datos | SEC EDGAR (10-K públicos)     |
+| Component     | Technology                    |
+| ------------- | ----------------------------- |
+| Language      | Python 3.12+                  |
+| Embeddings    | Gemini `gemini-embedding-001` |
+| Generation    | Gemini `gemini-2.5-flash`     |
+| Vector DB     | ChromaDB (local, persistent)  |
+| UI            | Streamlit                     |
+| Data source   | SEC EDGAR (public 10-K filings) |
 
-Sin frameworks de orquestación (LangChain, LlamaIndex) — pipeline construido
-desde cero para entender cada paso.
+No orchestration frameworks (LangChain, LlamaIndex) — the pipeline is built
+from scratch to understand every step.
 
 ---
 
-## Arquitectura
+## Architecture
 
 ```text
 SEC EDGAR
     │
     ▼
-download.py ──► data/raw/*.pdf
+download_10k.py ──► data/raw/*.pdf
     │
     ▼
 ingest.py ──► data/processed/chunks.jsonl
-                    (chunks de 1000 tokens, overlap 200)
+                    (1,000-character chunks, 200 overlap)
     │
     ▼
-embed.py ──► ChromaDB (colección: finance_10k)
+embed.py ──► ChromaDB (collection: finance_10k)
                     (gemini-embedding-001, RETRIEVAL_DOCUMENT)
     │
     ▼
-         ┌─────────────────────────────┐
-query ──►│ retrieve.py                 │
+         ┌───────────────────────────────┐
+query ──►│ retrieve.py                   │
          │  embed query (RETRIEVAL_QUERY)│
-         │  cosine similarity search   │
-         │  filtro opcional por ticker │
-         └──────────────┬──────────────┘
+         │  cosine similarity search     │
+         │  optional per-ticker filter   │
+         └──────────────┬────────────────┘
                         │ top-5 chunks
                         ▼
                   generate.py
-                  (gemini-2.5-flash + contexto)
+                  (gemini-2.5-flash + context)
                         │
                         ▼
                     app.py (Streamlit)
@@ -72,30 +73,30 @@ query ──►│ retrieve.py                 │
 
 ---
 
-## Estructura del repo
+## Repo structure
 
 ```text
 .
 ├── data/
 │   └── processed/
-│       └── chunks.jsonl       # 1098 chunks indexados
+│       └── chunks.jsonl       # 1098 indexed chunks
 ├── src/
-│   ├── download.py            # Descarga 10-Ks de SEC EDGAR
-│   ├── ingest.py              # PDF → chunks JSONL
-│   ├── embed.py               # Genera embeddings y los guarda en ChromaDB
-│   ├── retrieve.py            # Búsqueda vectorial con filtro por empresa
-│   ├── generate.py            # Llama a Gemini con el contexto recuperado
-│   └── app.py                 # Interfaz Streamlit
-├── .env                       # GEMINI_API_KEY (no versionado)
+│   ├── download_10k.py        # Downloads 10-Ks from SEC EDGAR
+│   ├── ingest.py              # PDF → JSONL chunks
+│   ├── embed.py               # Generates embeddings and stores them in ChromaDB
+│   ├── retrieve.py            # Vector search with per-company filtering
+│   ├── generate.py            # Calls Gemini with the retrieved context
+│   └── app.py                 # Streamlit UI
+├── .env                       # GEMINI_API_KEY (not versioned)
 ├── requirements.txt
 └── .gitignore
 ```
 
 ---
 
-## Cómo correrlo
+## How to run it
 
-### 1. Instalar dependencias
+### 1. Install dependencies
 
 ```bash
 python -m venv venv
@@ -103,34 +104,34 @@ source venv/bin/activate        # Windows: venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-### 2. Configurar API key
+### 2. Configure the API key
 
 ```bash
-# Crear archivo .env en la raíz del proyecto:
-GEMINI_API_KEY=tu_api_key_aqui
+# Create a .env file at the project root:
+GEMINI_API_KEY=your_api_key_here
 ```
 
-### 3. Descargar los 10-Ks
+### 3. Download the 10-Ks
 
 ```bash
-python src/download.py
+python src/download_10k.py
 ```
 
-### 4. Trocear los PDFs en chunks
+### 4. Split the PDFs into chunks
 
 ```bash
 python src/ingest.py
 ```
 
-### 5. Generar embeddings e indexar en ChromaDB
+### 5. Generate embeddings and index them in ChromaDB
 
 ```bash
 python src/embed.py
-# Nota: el free tier de Gemini permite 100 req/min y 1000 req/día.
-# El script gestiona los rate limits automáticamente.
+# Note: the Gemini free tier allows 100 req/min and 1,000 req/day.
+# The script handles rate limits automatically.
 ```
 
-### 6. Lanzar la aplicación
+### 6. Launch the app
 
 ```bash
 streamlit run src/app.py
@@ -138,42 +139,45 @@ streamlit run src/app.py
 
 ---
 
-## Decisiones técnicas
+## Technical decisions
 
-### Chunk size: 1000 tokens, overlap 200
+### Chunk size: 1,000 characters, 200 overlap
 
-Los 10-K incluyen tablas financieras densas donde un número sin contexto no
-tiene sentido. Con 1000 tokens el chunk suele contener una sección completa.
-El overlap de 200 evita cortar una frase entre dos chunks consecutivos.
+10-K filings contain dense financial tables where a number without its
+surrounding context is meaningless. 1,000-character chunks usually keep a
+statement together with the labels that give it meaning, and the 200-character
+overlap avoids splitting a sentence across two consecutive chunks.
 
-### ChromaDB local con distancia coseno
+### Local ChromaDB with cosine distance
 
-La similitud coseno mide el ángulo entre vectores, no su magnitud — lo que
-importa para texto es la dirección semántica, no la longitud del fragmento.
-ChromaDB local elimina latencia de red y coste de servicio en un prototipo.
+Cosine similarity measures the angle between vectors, not their magnitude —
+for text, what matters is the semantic direction, not the length of the
+passage. Running ChromaDB locally removes network latency and service costs
+for a prototype.
 
 ### `RETRIEVAL_DOCUMENT` vs `RETRIEVAL_QUERY`
 
-Gemini genera vectores distintos según el rol del texto. Los chunks se indexan
-con `RETRIEVAL_DOCUMENT`; las preguntas se embeben con `RETRIEVAL_QUERY`.
-Usar el mismo task_type para ambos degradaría la calidad de recuperación.
+Gemini produces different vectors depending on the role of the text. Chunks
+are indexed with `RETRIEVAL_DOCUMENT`; questions are embedded with
+`RETRIEVAL_QUERY`. Using the same task_type for both would degrade retrieval
+quality.
 
-### Sin LangChain
+### No LangChain
 
-Pipeline de ~6 funciones sin abstracciones intermedias. Cada paso es
-inspeccionable directamente, lo que facilita depuración y entender qué ocurre
-en cada fase del RAG.
+A pipeline of ~6 functions with no intermediate abstractions. Every step can
+be inspected directly, which makes debugging easier and keeps each phase of
+the RAG flow understandable.
 
 ---
 
 ## Roadmap
 
-- [x] Descarga automática de 10-Ks desde SEC EDGAR
-- [x] Chunking de PDFs (1000 tokens, overlap 200)
+- [x] Automatic 10-K download from SEC EDGAR
+- [x] PDF chunking (1,000 characters, 200 overlap)
 - [x] Embeddings + ChromaDB
-- [x] Recuperación vectorial con filtro por empresa
-- [x] Generación de respuestas con Gemini
-- [x] Interfaz Streamlit
-- [ ] Dataset de evaluación (20-30 preguntas con respuesta esperada)
-- [ ] Métricas RAGAS (faithfulness, answer relevancy, context recall)
-- [ ] Despliegue con URL pública
+- [x] Vector retrieval with per-company filtering
+- [x] Answer generation with Gemini
+- [x] Streamlit UI
+- [ ] Evaluation dataset (20-30 questions with expected answers)
+- [ ] RAGAS metrics (faithfulness, answer relevancy, context recall)
+- [ ] Public deployment
