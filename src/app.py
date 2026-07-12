@@ -18,11 +18,18 @@ with st.sidebar:
         "NVIDIA (NVDA)": "NVDA",
     }
     ticker_label = st.selectbox("Company", list(ticker_options.keys()))
-    ticker = ticker_options[ticker_label]  # None o "AAPL"/"MSFT"/"NVDA"
+    ticker = ticker_options[ticker_label]  # None or "AAPL"/"MSFT"/"NVDA"
 
 query = st.text_input("Your question")
 
 if st.button("Ask") and query:
     with st.spinner("Searching and generating answer..."):
-        answer = generate(query, ticker=ticker)
+        answer, chunks = generate(query, ticker=ticker)
     st.markdown(answer)
+    with st.expander("Sources"):
+        for i, chunk in enumerate(chunks, 1):
+            st.markdown(
+                f"**{i}. [{chunk['ticker']}] — distance: {chunk['distance']:.4f}**"
+            )
+            st.caption(chunk["source"])
+            st.text(chunk["text"][:300])

@@ -20,7 +20,7 @@ def build_prompt(query: str, chunks: list[dict]) -> str:
     return f"{SYSTEM_PROMPT}\n\nContext:\n{context}\n\nQuestion: {query}\n\nAnswer:"
 
 
-def generate(query: str, ticker: str = None) -> str:
+def generate(query: str, ticker: str | None = None) -> tuple[str, list[dict]]:
     load_dotenv()
     api_key = os.getenv("GEMINI_API_KEY")
     if not api_key:
@@ -32,7 +32,7 @@ def generate(query: str, ticker: str = None) -> str:
     response = gemini_client.models.generate_content(
         model=GENERATION_MODEL, contents=prompt
     )
-    return response.text
+    return response.text or "", chunks
 
 
 def main():
@@ -46,7 +46,7 @@ def main():
         ticker = None
 
     print("\nGenerating answer...\n")
-    answer = generate(query, ticker=ticker)
+    answer, _ = generate(query, ticker=ticker)
     print(answer)
 
 

@@ -19,10 +19,14 @@ def embed_query(gemini_client: genai.Client, query: str) -> list[float]:
         contents=query,
         config=types.EmbedContentConfig(task_type="RETRIEVAL_QUERY"),
     )
-    return response.embeddings[0].values
+    if not response.embeddings:
+        return []
+    return list(response.embeddings[0].values or [])
 
 
-def retrieve(query: str, n_results: int = TOP_K, ticker: str = None) -> list[dict]:
+def retrieve(
+    query: str, n_results: int = TOP_K, ticker: str | None = None
+) -> list[dict]:
     load_dotenv()
     api_key = os.getenv("GEMINI_API_KEY")
     if not api_key:
@@ -38,17 +42,17 @@ def retrieve(query: str, n_results: int = TOP_K, ticker: str = None) -> list[dic
     results = collection.query(
         query_embeddings=[embedded_query],
         n_results=n_results,
-        where=where,
+        where=where,  # type: ignore[arg-type]
         include=["documents", "metadatas", "distances"],
     )
 
     chunks = []
 
-    for doc, meta, dist in zip(
-        results["documents"][0],
-        results["metadatas"][0],
-        results["distances"][0],
-    ):
+    documents = results["documents"] or [[]]
+    metadatas = results["metadatas"] or [[]]
+    distances = results["distances"] or [[]]
+
+    for doc, meta, dist in zip(documents[0], metadatas[0], distances[0]):
         chunks.append(
             {
                 "text": doc,
@@ -66,9 +70,9 @@ def main():
     retrieved_chunks = retrieve(query)
     for i, chunk in enumerate(retrieved_chunks, 1):
         print(
-            f"\n--- Resultado {i} [{chunk['ticker']}] (distance: {chunk['distance']:.4f}) ---"
+            f"\n--- Result {i} [{chunk['ticker']}] (distance: {chunk['distance']:.4f}) ---"
         )
-        print(f"Fuente: {chunk['source']}")
+        print(f"Source: {chunk['source']}")
         print(chunk["text"][:300])
 
 
