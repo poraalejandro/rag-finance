@@ -6,6 +6,25 @@ sys.path.insert(0, str(Path(__file__).parent))
 import streamlit as st
 from generate import generate
 
+import os
+from dotenv import load_dotenv
+from google import genai
+import chromadb
+
+CHROMA_DIR = Path(__file__).parent.parent / "data" / "chroma_db"
+
+
+@st.cache_resource
+def get_clients():
+    load_dotenv()
+    api_key = os.getenv("GEMINI_API_KEY")
+    if not api_key:
+        raise EnvironmentError("GEMINI_API_KEY not set in .env file")
+    gemini = genai.Client(api_key=api_key)
+    chroma = chromadb.PersistentClient(path=str(CHROMA_DIR))
+    return gemini, chroma
+
+
 st.title("RAG Finance Assistant")
 st.write("Ask questions about Apple, Microsoft, and NVIDIA 10-K annual reports.")
 
@@ -24,7 +43,13 @@ query = st.text_input("Your question")
 
 if st.button("Ask") and query:
     with st.spinner("Searching and generating answer..."):
-        answer, chunks = generate(query, ticker=ticker)
+        gemini_client, chroma_client = get_clients()
+        answer, chunks = generate(
+            query,
+            gemini_client=gemini_client,
+            chroma_client=chroma_client,
+            ticker=ticker,
+        )
     st.markdown(answer)
     with st.expander("Sources"):
         for i, chunk in enumerate(chunks, 1):

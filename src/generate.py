@@ -2,9 +2,14 @@ import os
 
 from dotenv import load_dotenv
 from google import genai
+from chromadb.api import ClientAPI
+import chromadb
+from pathlib import Path
+
 
 from retrieve import retrieve
 
+CHROMA_DIR = Path(__file__).parent.parent / "data" / "chroma_db"
 GENERATION_MODEL = "gemini-2.5-flash"
 
 SYSTEM_PROMPT = """You are a financial analyst assistant.
@@ -20,14 +25,14 @@ def build_prompt(query: str, chunks: list[dict]) -> str:
     return f"{SYSTEM_PROMPT}\n\nContext:\n{context}\n\nQuestion: {query}\n\nAnswer:"
 
 
-def generate(query: str, ticker: str | None = None) -> tuple[str, list[dict]]:
-    load_dotenv()
-    api_key = os.getenv("GEMINI_API_KEY")
-    if not api_key:
-        raise EnvironmentError("GEMINI_API_KEY not set in .env file")
+def generate(
+    query: str,
+    gemini_client: genai.Client,
+    chroma_client: ClientAPI,
+    ticker: str | None = None,
+) -> tuple[str, list[dict]]:
 
-    gemini_client = genai.Client(api_key=api_key)
-    chunks = retrieve(query, ticker=ticker)
+    chunks = retrieve(query, gemini_client, chroma_client, ticker=ticker)
     prompt = build_prompt(query, chunks)
     response = gemini_client.models.generate_content(
         model=GENERATION_MODEL, contents=prompt
@@ -36,6 +41,14 @@ def generate(query: str, ticker: str | None = None) -> tuple[str, list[dict]]:
 
 
 def main():
+    load_dotenv()
+    api_key = os.getenv("GEMINI_API_KEY")
+    if not api_key:
+        raise EnvironmentError("GEMINI_API_KEY not set in .env file")
+
+    gemini_client = genai.Client(api_key=api_key)
+    chroma_client = chromadb.PersistentClient(path=str(CHROMA_DIR))
+
     query = input("Enter your query: ")
     ticker = (
         input("Filter by ticker (AAPL/MSFT/NVDA) or press Enter to skip: ")
@@ -46,7 +59,9 @@ def main():
         ticker = None
 
     print("\nGenerating answer...\n")
-    answer, _ = generate(query, ticker=ticker)
+    answer, _ = generate(
+        query, gemini_client=gemini_client, chroma_client=chroma_client, ticker=ticker
+    )
     print(answer)
 
 

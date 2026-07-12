@@ -2,6 +2,7 @@ import os
 from pathlib import Path
 
 import chromadb
+from chromadb.api import ClientAPI
 from dotenv import load_dotenv
 from google import genai
 from google.genai import types
@@ -25,15 +26,13 @@ def embed_query(gemini_client: genai.Client, query: str) -> list[float]:
 
 
 def retrieve(
-    query: str, n_results: int = TOP_K, ticker: str | None = None
+    query: str,
+    gemini_client: genai.Client,
+    chroma_client: ClientAPI,
+    n_results: int = TOP_K,
+    ticker: str | None = None,
 ) -> list[dict]:
-    load_dotenv()
-    api_key = os.getenv("GEMINI_API_KEY")
-    if not api_key:
-        raise EnvironmentError("GEMINI_API_KEY not set in .env file")
 
-    gemini_client = genai.Client(api_key=api_key)
-    chroma_client = chromadb.PersistentClient(path=str(CHROMA_DIR))
     collection = chroma_client.get_collection(name=COLLECTION_NAME)
 
     embedded_query = embed_query(gemini_client, query)
@@ -66,8 +65,16 @@ def retrieve(
 
 
 def main():
+    load_dotenv()
+    api_key = os.getenv("GEMINI_API_KEY")
+
+    if not api_key:
+        raise EnvironmentError("GEMINI_API_KEY not set in .env file")
+
+    gemini_client = genai.Client(api_key=api_key)
+    chroma_client = chromadb.PersistentClient(path=str(CHROMA_DIR))
     query = input("Enter your query: ")
-    retrieved_chunks = retrieve(query)
+    retrieved_chunks = retrieve(query, gemini_client, chroma_client)
     for i, chunk in enumerate(retrieved_chunks, 1):
         print(
             f"\n--- Result {i} [{chunk['ticker']}] (distance: {chunk['distance']:.4f}) ---"
