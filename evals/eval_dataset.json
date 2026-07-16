@@ -1,0 +1,102 @@
+[
+  {
+    "question": "What was Microsoft's total revenue in fiscal year 2024?",
+    "ground_truth": "Microsoft's total revenue in fiscal year 2024 was $245,122 million.",
+    "ticker": "MSFT"
+  },
+  {
+    "question": "What were Microsoft's three business segments in fiscal year 2024 and their revenues?",
+    "ground_truth": "Microsoft's three segments in FY2024 were: Productivity and Business Processes ($106,820 million), Intelligent Cloud ($87,464 million), and More Personal Computing ($50,838 million), totaling $245,122 million.",
+    "ticker": "MSFT"
+  },
+  {
+    "question": "How much did Microsoft's cloud revenue grow in fiscal year 2025?",
+    "ground_truth": "Microsoft Cloud revenue increased 23% to $168.9 billion in fiscal year 2025.",
+    "ticker": "MSFT"
+  },
+  {
+    "question": "What was Microsoft's total revenue in fiscal year 2023?",
+    "ground_truth": "Microsoft's total revenue in fiscal year 2023 was $211,915 million.",
+    "ticker": "MSFT"
+  },
+  {
+    "question": "What was Microsoft's largest revenue category by product in fiscal year 2024?",
+    "ground_truth": "Microsoft's largest revenue category by product in fiscal year 2024 was Server products and cloud services at $79,828 million.",
+    "ticker": "MSFT"
+  },
+  {
+    "question": "How much revenue did LinkedIn generate for Microsoft in fiscal year 2024?",
+    "ground_truth": "LinkedIn generated $16,372 million in revenue for Microsoft in fiscal year 2024.",
+    "ticker": "MSFT"
+  },
+  {
+    "question": "What was Apple's largest revenue segment in fiscal year 2024?",
+    "ground_truth": "Apple's largest revenue segment in fiscal year 2024 was iPhone, which represented the majority of the company's net sales.",
+    "ticker": "AAPL"
+  },
+  {
+    "question": "What were Apple's main product categories by revenue in fiscal year 2024?",
+    "ground_truth": "Apple's main product categories in fiscal year 2024 were iPhone, Mac, iPad, Wearables/Home/Accessories, and Services.",
+    "ticker": "AAPL"
+  },
+  {
+    "question": "What was NVIDIA's largest revenue segment in fiscal year 2024?",
+    "ground_truth": "NVIDIA's largest revenue segment in fiscal year 2024 was Data Center, which grew dramatically driven by demand for AI accelerators and GPUs.",
+    "ticker": "NVDA"
+  },
+  {
+    "question": "What risks related to supply chain does Apple mention in its 10-K?",
+    "ground_truth": "Apple's 10-K mentions risks related to dependence on single-source suppliers for certain components, concentration of manufacturing in specific geographic regions, and potential disruptions from geopolitical tensions, natural disasters, or pandemics affecting supply chain operations.",
+    "ticker": "AAPL"
+  },
+  {
+    "question": "What does Microsoft identify as key risks related to artificial intelligence in its 10-K?",
+    "ground_truth": "Microsoft identifies risks related to AI including potential for AI systems to produce harmful or inaccurate content, regulatory uncertainty around AI, competition in the AI space, and the need for significant investment in AI infrastructure and research.",
+    "ticker": "MSFT"
+  },
+  {
+    "question": "What was Microsoft's revenue growth rate from fiscal year 2023 to fiscal year 2024?",
+    "ground_truth": "Microsoft's revenue grew from $211,915 million in FY2023 to $245,122 million in FY2024, representing approximately 16% growth.",
+    "ticker": "MSFT"
+  },
+  {
+    "question": "Which of the three companies — Apple, Microsoft, or NVIDIA — had the highest revenue in their most recent fiscal year?",
+    "ground_truth": "Based on the 10-K filings, Apple had the highest revenue among the three companies in their most recent fiscal year, with total net sales significantly exceeding those of Microsoft and NVIDIA.",
+    "ticker": null
+  },
+  {
+    "question": "What was Microsoft's Gaming revenue in fiscal year 2024?",
+    "ground_truth": "Microsoft's Gaming revenue in fiscal year 2024 was $21,503 million.",
+    "ticker": "MSFT"
+  },
+  {
+    "question": "What does NVIDIA describe as the primary driver of its data center revenue growth?",
+    "ground_truth": "NVIDIA describes the primary driver of data center revenue growth as surging demand for its GPUs and accelerated computing platforms used for training and inference of artificial intelligence and machine learning models.",
+    "ticker": "NVDA"
+  },
+  {
+    "question": "What was Apple's Services revenue in fiscal year 2024?",
+    "ground_truth": "Apple's Services segment generated significant revenue in fiscal year 2024, representing a growing and high-margin portion of the company's total net sales.",
+    "ticker": "AAPL"
+  },
+  {
+    "question": "What was Microsoft's total revenue in fiscal year 2025?",
+    "ground_truth": "Microsoft's total revenue in fiscal year 2025 was $281,724 million.",
+    "ticker": "MSFT"
+  },
+  {
+    "question": "What dividend policy does Apple describe in its 10-K?",
+    "ground_truth": "Apple's 10-K describes a policy of returning capital to shareholders through dividends and share repurchase programs, with the company paying quarterly cash dividends.",
+    "ticker": "AAPL"
+  },
+  {
+    "question": "What was Microsoft's net income in fiscal year 2024?",
+    "ground_truth": "The context does not provide Microsoft's net income figure for fiscal year 2024 directly — if the retrieved chunks do not contain this specific figure, this question tests that the system correctly says it cannot answer rather than hallucinating a number.",
+    "ticker": "MSFT"
+  },
+  {
+    "question": "What is the stock price of Microsoft as of today?",
+    "ground_truth": "The 10-K annual reports do not contain real-time stock price information. The system should indicate it cannot answer this question from the provided context.",
+    "ticker": "MSFT"
+  }
+]

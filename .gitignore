@@ -12,3 +12,5 @@ data/chroma_db/
 src/embed_draft.py
 .claude/
 *.log
+evals/eval_results.json
+evals/scores.json
