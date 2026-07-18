@@ -7,6 +7,7 @@ from dotenv import load_dotenv
 from google import genai
 import chromadb
 from generate import generate
+import time
 
 CHROMA_DIR = Path(__file__).parent.parent / "data" / "chroma_db"
 EVAL_DATASET = Path(__file__).parent / "eval_dataset.json"
@@ -36,6 +37,8 @@ def main():
         )
         item["answer"] = answer
         item["contexts"] = [c["text"] for c in chunks]
+        if i < len(dataset):
+            time.sleep(13)
 
     with EVAL_RESULTS.open("w", encoding="utf-8") as f:
         json.dump(dataset, f, indent=2, ensure_ascii=False)
