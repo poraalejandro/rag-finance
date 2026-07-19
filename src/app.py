@@ -17,9 +17,9 @@ CHROMA_DIR = Path(__file__).parent.parent / "data" / "chroma_db"
 @st.cache_resource
 def get_clients():
     load_dotenv()
-    api_key = os.getenv("GEMINI_API_KEY")
+    api_key = os.getenv("GEMINI_API_KEY") or st.secrets.get("GEMINI_API_KEY")
     if not api_key:
-        raise EnvironmentError("GEMINI_API_KEY not set in .env file")
+        raise EnvironmentError("GEMINI_API_KEY not set")
     gemini = genai.Client(api_key=api_key)
     chroma = chromadb.PersistentClient(path=str(CHROMA_DIR))
     return gemini, chroma

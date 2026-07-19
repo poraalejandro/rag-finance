@@ -3,12 +3,9 @@ __pycache__/
 .env
 .venv/
 venv/
-*.db
-*.sqlite3
 .DS_Store
 data/processed/*.pkl
 data/raw/
-data/chroma_db/
 src/embed_draft.py
 .claude/
 *.log
