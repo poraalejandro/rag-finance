@@ -1,15 +1,20 @@
 import sys
+import os
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
 
 import streamlit as st
-from generate import generate
-
-import os
 from dotenv import load_dotenv
 from google import genai
 import chromadb
+from generate import generate
+
+st.set_page_config(
+    page_title="RAG Finance Assistant",
+    page_icon=":material/query_stats:",
+    layout="centered",
+)
 
 CHROMA_DIR = Path(__file__).parent.parent / "data" / "chroma_db"
 
@@ -25,23 +30,38 @@ def get_clients():
     return gemini, chroma
 
 
-st.title("RAG Finance Assistant")
-st.write("Ask questions about Apple, Microsoft, and NVIDIA 10-K annual reports.")
-
 with st.sidebar:
-    st.header("Filters")
+    st.markdown("### :material/filter_list: Filters")
     ticker_options = {
         "All companies": None,
         "Apple (AAPL)": "AAPL",
         "Microsoft (MSFT)": "MSFT",
         "NVIDIA (NVDA)": "NVDA",
     }
-    ticker_label = st.selectbox("Company", list(ticker_options.keys()))
-    ticker = ticker_options[ticker_label]  # None or "AAPL"/"MSFT"/"NVDA"
+    ticker_label = st.selectbox("Company", list(ticker_options.keys()), label_visibility="collapsed")
+    ticker = ticker_options[ticker_label]
 
-query = st.text_input("Your question")
+    st.divider()
+    st.caption(":material/description: SEC EDGAR 10-K filings")
+    st.caption(":material/corporate_fare: AAPL · MSFT · NVDA")
 
-if st.button("Ask") and query:
+
+st.title(":material/query_stats: RAG Finance Assistant")
+st.caption("Ask questions about Apple, Microsoft, and NVIDIA annual reports (10-K).")
+
+with st.form("query_form"):
+    query = st.text_input(
+        "question",
+        placeholder="e.g. Where does Microsoft generate the most revenue?",
+        label_visibility="collapsed",
+    )
+    submitted = st.form_submit_button(
+        "Ask",
+        icon=":material/send:",
+        type="primary",
+    )
+
+if submitted and query:
     with st.spinner("Searching and generating answer..."):
         gemini_client, chroma_client = get_clients()
         answer, chunks = generate(
@@ -50,11 +70,14 @@ if st.button("Ask") and query:
             chroma_client=chroma_client,
             ticker=ticker,
         )
-    st.markdown(answer)
-    with st.expander("Sources"):
+
+    with st.container(border=True):
+        st.markdown(answer)
+
+    with st.expander(":material/folder_open: Sources", expanded=False):
         for i, chunk in enumerate(chunks, 1):
             st.markdown(
-                f"**{i}. [{chunk['ticker']}] — distance: {chunk['distance']:.4f}**"
+                f"**{i}. :blue[[{chunk['ticker']}]]** — distance: `{chunk['distance']:.4f}`"
             )
             st.caption(chunk["source"])
             st.text(chunk["text"][:300])

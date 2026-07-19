@@ -9,5 +9,6 @@ data/raw/
 src/embed_draft.py
 .claude/
 *.log
+.streamlit/secrets.toml
 evals/eval_results.json
 evals/scores.json
