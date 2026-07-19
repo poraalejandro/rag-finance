@@ -23,8 +23,9 @@ from ragas.run_config import RunConfig
 EVAL_RESULTS = Path(__file__).parent / "eval_results.json"
 SCORE_OUTPUT = Path(__file__).parent / "scores.json"
 # Free-tier Gemini via langchain allows 20 req/day per model.
-# 3 metrics × N samples = 3N calls — keep N ≤ 6 to stay under quota.
-MAX_SAMPLES = 6
+# Faithfulness makes ~3-5 internal calls per sample (statement extraction + verification).
+# 3 samples keeps total well under the 20/day limit.
+MAX_SAMPLES = 3
 
 
 def main():
@@ -34,7 +35,7 @@ def main():
         raise EnvironmentError("GEMINI_API_KEY not set in .env file")
 
     llm = LangchainLLMWrapper(
-        ChatGoogleGenerativeAI(model="gemini-2.5-flash")
+        ChatGoogleGenerativeAI(model="gemini-2.5-flash-lite")
     )
     embeddings = LangchainEmbeddingsWrapper(
         GoogleGenerativeAIEmbeddings(model="models/gemini-embedding-001")
@@ -62,7 +63,7 @@ def main():
             LLMContextRecall(llm=llm),
             ResponseRelevancy(llm=llm, embeddings=embeddings),
         ],
-        run_config=RunConfig(timeout=120, max_retries=3, max_wait=60),
+        run_config=RunConfig(timeout=300, max_retries=3, max_wait=60),
     )
 
     df = scores.to_pandas()  # type: ignore[union-attr]
