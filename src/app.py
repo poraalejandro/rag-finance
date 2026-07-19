@@ -62,22 +62,35 @@ with st.form("query_form"):
     )
 
 if submitted and query:
-    with st.spinner("Searching and generating answer..."):
-        gemini_client, chroma_client = get_clients()
-        answer, chunks = generate(
-            query,
-            gemini_client=gemini_client,
-            chroma_client=chroma_client,
-            ticker=ticker,
-        )
-
-    with st.container(border=True):
-        st.markdown(answer)
-
-    with st.expander(":material/folder_open: Sources", expanded=False):
-        for i, chunk in enumerate(chunks, 1):
-            st.markdown(
-                f"**{i}. :blue[[{chunk['ticker']}]]** — distance: `{chunk['distance']:.4f}`"
+    try:
+        with st.spinner("Searching and generating answer..."):
+            gemini_client, chroma_client = get_clients()
+            answer, chunks = generate(
+                query,
+                gemini_client=gemini_client,
+                chroma_client=chroma_client,
+                ticker=ticker,
             )
-            st.caption(chunk["source"])
-            st.text(chunk["text"][:300])
+
+        with st.container(border=True):
+            st.markdown(answer)
+
+        with st.expander(":material/folder_open: Sources", expanded=False):
+            for i, chunk in enumerate(chunks, 1):
+                st.markdown(
+                    f"**{i}. :blue[[{chunk['ticker']}]]** — distance: `{chunk['distance']:.4f}`"
+                )
+                st.caption(chunk["source"])
+                st.text(chunk["text"][:300])
+
+    except Exception as e:
+        if "429" in str(e) or "RESOURCE_EXHAUSTED" in str(e) or "quota" in str(e).lower():
+            st.warning(
+                "The API is temporarily rate-limited. Please try again in a few minutes.",
+                icon=":material/schedule:",
+            )
+        else:
+            st.error(
+                "Something went wrong while generating the answer. Please try again.",
+                icon=":material/error:",
+            )
