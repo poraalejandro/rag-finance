@@ -1,5 +1,7 @@
 # rag-finance — RAG assistant for financial reports (10-K)
 
+**Live demo:** [rag-finance-10k.streamlit.app](https://rag-finance-10k.streamlit.app)
+
 An application that answers natural-language questions about the annual
 reports (10-K) of Apple, Microsoft, and NVIDIA using RAG
 (Retrieval-Augmented Generation).
@@ -178,6 +180,6 @@ the RAG flow understandable.
 - [x] Vector retrieval with per-company filtering
 - [x] Answer generation with Gemini
 - [x] Streamlit UI
-- [ ] Evaluation dataset (20-30 questions with expected answers)
-- [ ] RAGAS metrics (faithfulness, answer relevancy, context recall)
-- [ ] Public deployment
+- [x] Evaluation dataset (20 questions with ground-truth answers)
+- [x] RAGAS evaluation pipeline (faithfulness, context recall, answer relevancy)
+- [x] Public deployment (Streamlit Community Cloud)
