@@ -141,6 +141,21 @@ streamlit run src/app.py
 
 ---
 
+## Evaluation (RAGAS)
+
+Evaluated with [RAGAS](https://docs.ragas.io/) on 3 financial questions from the MSFT 10-K:
+
+| Metric | Score | What it measures |
+|---|---|---|
+| Faithfulness | **1.00** | Every claim in the answer is grounded in the retrieved context (no hallucinations) |
+| Context Recall | **1.00** | The retriever found all the information needed to answer correctly |
+| Answer Relevancy | **0.85** | The answer directly addresses the question |
+
+Evaluation model: `gemini-2.5-flash-lite` via RAGAS 0.4.x.
+Run: `python evals/score.py` (requires a Gemini API key).
+
+---
+
 ## Technical decisions
 
 ### Chunk size: 1,000 characters, 200 overlap
